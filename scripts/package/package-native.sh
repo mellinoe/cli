@@ -18,7 +18,8 @@ source "$DIR/../common/_common.sh"
 
 if [[ "$OSNAME" == "ubuntu" ]]; then
     # Create Debian package
-    $REPOROOT/scripts/package/package-debian.sh
+    # $REPOROOT/scripts/package/package-debian.sh
+    $REPOROOT/scripts/package/sharedframework/package-debian.sh
 elif [[ "$OSNAME" == "osx" ]]; then
     # Create OSX PKG
     $REPOROOT/packaging/osx/package-osx.sh

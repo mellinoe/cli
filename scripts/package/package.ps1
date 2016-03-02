@@ -13,6 +13,9 @@ _ "$RepoRoot\scripts\package\package-zip.ps1"
 header "Generating dotnet MSI"
 _ "$RepoRoot\packaging\windows\generatemsi.ps1" @("$Stage2Dir")
 
+header "Generating dotnet host MSI"
+_ "$RepoRoot\packaging\dotnet\windows\generatemsi.ps1"
+
 header "Generating NuGet packages"
 _ "$RepoRoot\packaging\nuget\package.ps1" @("$Stage2Dir\bin", "$env:VersionSuffix")
 

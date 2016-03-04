@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?include "Variables.wxi" ?>
+  <Fragment>
+    <ComponentGroup Id="AuthoredRegistryKeys">
+      <!-- Include the 64-bit registry keys only in the 64-bit installer -->
+      <?if $(var.Platform) = x64?>
+      <Component Id="SetupRegistry_x64" Directory="TARGETDIR" Win64="yes">
+        <RegistryKey Root="HKLM" Key="SOFTWARE\dotnet\sharedframework\$(var.SharedFramework_Name) $(var.SharedFramework_Version)\Setup">
+          <RegistryValue Action="write" Name="Install" Type="integer" Value="1" KeyPath="yes"/>
+          <RegistryValue Action="write" Name="InstallDir" Type="string" Value="[SHAREDFRAMEWORKHOME]" />
+          <RegistryValue Action="write" Name="Version" Type="string" Value="$(var.SharedFramework_Version)" />
+        </RegistryKey>
+      </Component>
+      <?endif?>
+
+      <!-- Always install the 32-bit registry keys and env vars -->
+      <Component Id="SetupRegistry_x86" Directory="TARGETDIR" Win64="no">
+        <RegistryKey Root="HKLM" Key="SOFTWARE\sharedframework\$(var.SharedFramework_Name) $(var.SharedFramework_Version)\Setup">
+          <RegistryValue Action="write" Name="Install" Type="integer" Value="1" KeyPath="yes"/>
+          <RegistryValue Action="write" Name="InstallDir" Type="string" Value="[SHAREDFRAMEWORKHOME]" />
+          <RegistryValue Action="write" Name="Version" Type="string" Value="$(var.SharedFramework_Version)" />
+        </RegistryKey>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

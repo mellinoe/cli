@@ -3,8 +3,8 @@
 
 . "$PSScriptRoot\..\..\..\scripts\common\_common.ps1"
 
-$MSIFakeRoot = "$OutputDir\msi\host\fakeroot"
-$MSIObjRoot = "$OutputDir\msi\host\obj"
+$MSIFakeRoot = "$OutputDir\msi\dotnet\fakeroot"
+$MSIObjRoot = "$OutputDir\msi\dotnet\obj"
 
 $DotnetHostMSIOutput = ""
 $WixRoot = ""
@@ -109,6 +109,11 @@ Write-Host "Creating dotnet MSI at $DotnetLauncherMSIOutput"
 
 $WixRoot = AcquireWixTools
 
+if([string]::IsNullOrEmpty($WixRoot))
+{
+    Exit -1
+}
+
 if(!(Test-Path $MSIFakeRoot))
 {
     mkdir $MSIFakeRoot | Out-Null
@@ -122,11 +127,6 @@ if(!(Test-Path $MSIObjRoot))
 }
 
 Remove-Item -Recurse "$MSIObjRoot\*"
-
-if([string]::IsNullOrEmpty($WixRoot))
-{
-    Exit -1
-}
 
 MoveAndRenameCoreHost
 

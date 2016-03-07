@@ -229,6 +229,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                                         "1.2.3",
                                         "HASH",
                                         new [] { RuntimeAssembly.Create("Banana.dll")},
+                                        new ResourceAssembly[] {},
                                         new []
                                         {
                                             new RuntimeTarget("win7-x64",

@@ -192,7 +192,14 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
 
         private void Replace<T>(ref IList<T> list, IEnumerable<T> enumerable)
         {
-            list = new List<T>(enumerable);
+            if (enumerable == null)
+            {
+                list = null;
+            }
+            else
+            {
+                list = new List<T>(enumerable);
+            }
         }
 
         private void Add<T>(ref IList<T> list, T item)

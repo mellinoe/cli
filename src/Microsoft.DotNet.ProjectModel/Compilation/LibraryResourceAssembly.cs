@@ -5,7 +5,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
 {
     public class LibraryResourceAssembly
     {
-        public LibraryResourceAssembly(string locale, LibraryAsset asset)
+        public LibraryResourceAssembly(LibraryAsset asset, string locale)
         {
             Asset = asset;
             Locale = locale;

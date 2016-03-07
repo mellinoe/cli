@@ -202,7 +202,7 @@ namespace Microsoft.Extensions.DependencyModel
             foreach (var resourceProperty in resourcesObject)
             {
                 yield return new ResourceAssembly(
-                    locale: resourceProperty.Value.Value<string>(),
+                    locale: resourceProperty.Value[DependencyContextStrings.LocalePropertyName]?.Value<string>(),
                     path: resourceProperty.Key
                     );
             }

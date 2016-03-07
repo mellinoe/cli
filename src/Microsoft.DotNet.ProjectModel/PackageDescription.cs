@@ -45,6 +45,8 @@ namespace Microsoft.DotNet.ProjectModel
 
         public IEnumerable<LockFileContentFile> ContentFiles => Target.ContentFiles;
 
+        public IEnumerable<LockFileRuntimeTarget> RuntimeTargets => Target.RuntimeTargets;
+
         private IEnumerable<LockFileItem> FilterPlaceholders(IList<LockFileItem> items)
         {
             return items.Where(a => !PackageDependencyProvider.IsPlaceholderFile(a));

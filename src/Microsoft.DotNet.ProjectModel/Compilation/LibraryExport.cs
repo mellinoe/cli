@@ -49,6 +49,11 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         /// </summary>
         public IEnumerable<AnalyzerReference> AnalyzerReferences { get; }
 
+        /// <summary>
+        /// Get a list of analyzers provided by this export.
+        /// </summary>
+        public IEnumerable<RuntimeTarget> RuntimeTargets { get; }
+
         public LibraryExport(LibraryDescription library,
                              IEnumerable<LibraryAsset> compileAssemblies,
                              IEnumerable<LibraryAsset> sourceReferences,
@@ -56,7 +61,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                              IEnumerable<LibraryAsset> runtimeAssets,
                              IEnumerable<LibraryAsset> nativeLibraries,
                              IEnumerable<LibraryAsset> embeddedResources,
-                             IEnumerable<AnalyzerReference> analyzers)
+                             IEnumerable<AnalyzerReference> analyzers,
+                             IEnumerable<RuntimeTarget> runtimeTargets)
         {
             Library = library;
             CompilationAssemblies = compileAssemblies;
@@ -66,6 +72,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             NativeLibraries = nativeLibraries;
             EmbeddedResources = embeddedResources;
             AnalyzerReferences = analyzers;
+            RuntimeTargets = runtimeTargets;
         }
 
         private string DebuggerDisplay => Library.Identity.ToString();

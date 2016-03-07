@@ -199,6 +199,28 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     }
                 }
             }
+            if (package.RuntimeTargets.Any())
+            {
+                foreach (var targetGroup in package.RuntimeTargets.GroupBy(t => t.Runtime))
+                {
+                    var runtime = new List<LibraryAsset>();
+                    var native = new List<LibraryAsset>();
+
+                    foreach (var lockFileRuntimeTarget in targetGroup)
+                    {
+                        if (string.Equals(lockFileRuntimeTarget.AssetType, "native", StringComparison.OrdinalIgnoreCase))
+                        {
+                            native.Add(LibraryAsset.CreateFromRelativePath(package.Path, lockFileRuntimeTarget.Path));
+                        }
+                        else if (string.Equals(lockFileRuntimeTarget.AssetType, "runtime", StringComparison.OrdinalIgnoreCase))
+                        {
+                            runtime.Add(LibraryAsset.CreateFromRelativePath(package.Path, lockFileRuntimeTarget.Path));
+                        }
+                    }
+
+                    builder.AddRuntimeTarget(new RuntimeTarget(targetGroup.Key, runtime, native));
+                }
+            }
 
             return builder.Build();
         }

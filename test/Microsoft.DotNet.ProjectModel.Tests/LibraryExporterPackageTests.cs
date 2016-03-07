@@ -1,3 +1,6 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,37 +18,7 @@ namespace Microsoft.DotNet.ProjectModel.Tests
     {
         private const string PackagePath = "PackagePath";
 
-        public LibraryExport ExportSingle(LibraryDescription description = null)
-        {
-            var rootProject = new Project()
-            {
-                Name = "RootProject",
-                CompilerName = "csc"
-              };
-
-            var rootProjectDescription = new ProjectDescription(
-                new LibraryRange(),
-                rootProject,
-                new LibraryRange[] { },
-                new TargetFrameworkInformation(),
-                true);
-
-            if (description == null)
-            {
-                description = rootProjectDescription;
-            }
-            else
-            {
-                description.Parents.Add(rootProjectDescription);
-            }
-
-            var libraryManager = new LibraryManager(new[] { description }, new DiagnosticMessage[] { }, "");
-            var allExports = new LibraryExporter(rootProjectDescription, libraryManager, "config", "runtime", "basepath", "solutionroot").GetAllExports();
-            var export = allExports.Single();
-            return export;
-        }
-
-        public PackageDescription CreateDescription(LockFileTargetLibrary target = null, LockFilePackageLibrary package = null)
+        private PackageDescription CreateDescription(LockFileTargetLibrary target = null, LockFilePackageLibrary package = null)
         {
             return new PackageDescription(PackagePath,
                 package ?? new LockFilePackageLibrary(),
@@ -342,8 +315,37 @@ namespace Microsoft.DotNet.ProjectModel.Tests
             native = runtimeTarget.NativeLibraries.Single();
             native.RelativePath.Should().Be(linuxNative);
             native.ResolvedPath.Should().Be(Path.Combine(PackagePath, linuxNative));
-
-
         }
+
+        private LibraryExport ExportSingle(LibraryDescription description = null)
+        {
+            var rootProject = new Project()
+            {
+                Name = "RootProject",
+                CompilerName = "csc"
+            };
+
+            var rootProjectDescription = new ProjectDescription(
+                new LibraryRange(),
+                rootProject,
+                new LibraryRange[] { },
+                new TargetFrameworkInformation(),
+                true);
+
+            if (description == null)
+            {
+                description = rootProjectDescription;
+            }
+            else
+            {
+                description.Parents.Add(rootProjectDescription);
+            }
+
+            var libraryManager = new LibraryManager(new[] { description }, new DiagnosticMessage[] { }, "");
+            var allExports = new LibraryExporter(rootProjectDescription, libraryManager, "config", "runtime", "basepath", "solutionroot").GetAllExports();
+            var export = allExports.Single();
+            return export;
+        }
+
     }
 }

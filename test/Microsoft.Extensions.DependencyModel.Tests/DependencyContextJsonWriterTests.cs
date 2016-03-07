@@ -154,6 +154,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                                         "1.2.3",
                                         "HASH",
                                         new [] { RuntimeAssembly.Create("Banana.dll")},
+                                        new [] { new ResourceAssembly("en-US\\Banana.Resource.dll", "en-US")},
                                         new []
                                         {
                                             new RuntimeTarget("win7-x64",
@@ -186,6 +187,10 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             var nativeLibrary = runtimeTargets.Should().HavePropertyAsObject("Banana.Win7-x64.so").Subject;
             nativeLibrary.Should().HavePropertyValue("rid", "win7-x64");
             nativeLibrary.Should().HavePropertyValue("assetType", "native");
+
+            var resourceAssemblies = library.Should().HavePropertyAsObject("resources").Subject;
+            var resourceAssembly = resourceAssemblies.Should().HavePropertyAsObject("en-US\\Banana.Resource.dll").Subject;
+            resourceAssembly.Should().HavePropertyValue("locale", "en-US");
 
             //libraries
             var libraries = result.Should().HavePropertyAsObject("libraries").Subject;
@@ -283,6 +288,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                                         "1.2.3",
                                         "HASH",
                                         new [] { RuntimeAssembly.Create("Banana.dll")},
+                                        new ResourceAssembly[] {},
                                         new RuntimeTarget[] {},
                                         new [] {
                                             new Dependency("Fruits.Abstract.dll","2.0.0")

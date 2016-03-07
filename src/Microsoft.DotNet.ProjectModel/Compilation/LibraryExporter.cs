@@ -218,7 +218,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                         }
                     }
 
-                    builder.AddRuntimeTarget(new RuntimeTarget(targetGroup.Key, runtime, native));
+                    builder.AddRuntimeTarget(new LibraryRuntimeTarget(targetGroup.Key, runtime, native));
                 }
             }
 

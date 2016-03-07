@@ -26,7 +26,9 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
 
         private IList<AnalyzerReference> _analyzerReferences;
 
-        private IList<RuntimeTarget> _runtimeTargets;
+        private IList<LibraryRuntimeTarget> _runtimeTargets;
+
+        private IList<LibraryResourceAssembly> _resourceAssemblies;
 
         public LibraryDescription Library { get; set; }
 
@@ -46,7 +48,9 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
 
         public IEnumerable<AnalyzerReference> AnalyzerReferences => _analyzerReferences;
 
-        public IEnumerable<RuntimeTarget> RuntimeTargets => _runtimeTargets;
+        public IEnumerable<LibraryRuntimeTarget> RuntimeTargets => _runtimeTargets;
+
+        public IEnumerable<LibraryResourceAssembly> ResourceAssemblies => _resourceAssemblies;
 
         public static LibraryExportBuilder Create(LibraryDescription library = null)
         {
@@ -68,7 +72,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                 NativeLibraries ?? EmptyArray<LibraryAsset>.Value,
                 EmbeddedResources ?? EmptyArray<LibraryAsset>.Value,
                 AnalyzerReferences ?? EmptyArray<AnalyzerReference>.Value,
-                RuntimeTargets ?? EmptyArray<RuntimeTarget>.Value);
+                RuntimeTargets ?? EmptyArray<LibraryRuntimeTarget>.Value,
+                ResourceAssemblies ?? EmptyArray<LibraryResourceAssembly>.Value);
         }
 
         public LibraryExportBuilder WithLibrary(LibraryDescription libraryDescription)
@@ -119,9 +124,15 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             return this;
         }
 
-        public LibraryExportBuilder WithRuntimeTargets(IEnumerable<RuntimeTarget> targets)
+        public LibraryExportBuilder WithRuntimeTargets(IEnumerable<LibraryRuntimeTarget> targets)
         {
             Replace(ref _runtimeTargets, targets);
+            return this;
+        }
+
+        public LibraryExportBuilder WithResourceAssemblies(IEnumerable<LibraryResourceAssembly> assemblies)
+        {
+            Replace(ref _resourceAssemblies, assemblies);
             return this;
         }
 
@@ -166,9 +177,16 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             Add(ref _analyzerReferences, asset);
             return this;
         }
-        public LibraryExportBuilder AddRuntimeTarget(RuntimeTarget target)
+
+        public LibraryExportBuilder AddRuntimeTarget(LibraryRuntimeTarget target)
         {
             Add(ref _runtimeTargets, target);
+            return this;
+        }
+
+        public LibraryExportBuilder AddResourceAssembly(LibraryResourceAssembly assembly)
+        {
+            Add(ref _resourceAssemblies, assembly);
             return this;
         }
 

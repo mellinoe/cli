@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.ProjectModel.Compilation
 {
-    public class RuntimeTarget
+    public class LibraryRuntimeTarget
     {
-        public RuntimeTarget(string runtime,
+        public LibraryRuntimeTarget(string runtime,
             IEnumerable<LibraryAsset> runtimeAssemblies,
             IEnumerable<LibraryAsset> nativeLibraries)
         {

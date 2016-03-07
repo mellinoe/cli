@@ -225,18 +225,16 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         private LibraryExport Export(
             LibraryDescription description,
             IEnumerable<LibraryAsset> compilationAssemblies = null,
-            IEnumerable<LibraryAsset> runtimeAssemblies = null)
+            IEnumerable<LibraryAsset> runtimeAssemblies = null,
+            IEnumerable<LibraryRuntimeTarget> runtimeTargets = null,
+            IEnumerable<LibraryResourceAssembly> resourceAssemblies = null)
         {
-            return new LibraryExport(
-                description,
-                compilationAssemblies ?? Enumerable.Empty<LibraryAsset>(),
-                Enumerable.Empty<LibraryAsset>(),
-                runtimeAssemblies ?? Enumerable.Empty<LibraryAsset>(),
-                Enumerable.Empty<LibraryAsset>(),
-                Enumerable.Empty<LibraryAsset>(),
-                Enumerable.Empty<LibraryAsset>(),
-                Enumerable.Empty<AnalyzerReference>()
-            );
+            return LibraryExportBuilder.Create(description)
+                .WithCompilationAssemblies(compilationAssemblies)
+                .WithRuntimeAssemblies(runtimeAssemblies)
+                .WithRuntimeTargets(runtimeTargets)
+                .WithResourceAssemblies(resourceAssemblies)
+                .Build();
         }
 
         private PackageDescription PackageDescription(

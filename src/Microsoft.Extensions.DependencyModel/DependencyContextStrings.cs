@@ -66,5 +66,7 @@ namespace Microsoft.Extensions.DependencyModel
         internal const string RuntimeAssetType = "runtime";
 
         internal const string NativeAssetType = "native";
+
+        internal const string ResourceAssembliesPropertyName = "resources";
     }
 }

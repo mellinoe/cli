@@ -122,6 +122,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                     .WithNativeLibraries(libraryExport.NativeLibraries)
                     .WithEmbedddedResources(libraryExport.EmbeddedResources)
                     .WithAnalyzerReference(analyzerReferences)
+                    .WithResourceAssemblies(libraryExport.ResourceAssemblies)
+                    .WithRuntimeTargets(libraryExport.RuntimeTargets)
                     .Build();
             }
         }

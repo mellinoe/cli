@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.DotNet.ProjectModel.Compilation;
@@ -298,7 +299,10 @@ namespace Microsoft.DotNet.ProjectModel.Tests
                     ),
                    }
                });
-
+            while (!Debugger.IsAttached)
+            {
+                
+            }
             var result = ExportSingle(description);
             result.RuntimeTargets.Should().HaveCount(2);
 

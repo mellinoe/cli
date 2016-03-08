@@ -181,7 +181,7 @@ namespace Microsoft.DotNet.ProjectModel.Graph
             return new LockFileRuntimeTarget(
                 path: property,
                 runtime: jsonObject.ValueAsString("runtime"),
-                assetType: jsonObject.ValueAsString("runtime")
+                assetType: jsonObject.ValueAsString("assetType")
                 );
         }
 

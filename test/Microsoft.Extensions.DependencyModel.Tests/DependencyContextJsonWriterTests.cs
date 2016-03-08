@@ -316,6 +316,74 @@ namespace Microsoft.Extensions.DependencyModel.Tests
         }
 
         [Fact]
+        public void WritesResourceAssembliesForNonPortable()
+        {
+            var result = Save(Create(
+                            "Target",
+                            "runtime",
+                            false,
+                            runtimeLibraries: new[]
+                            {
+                                new RuntimeLibrary(
+                                        "package",
+                                        "PackageName",
+                                        "1.2.3",
+                                        "HASH",
+                                        new RuntimeAssembly[] { },
+                                        new []
+                                        {
+                                            new ResourceAssembly("en-US/Fruits.resources.dll", "en-US")
+                                        },
+                                        new RuntimeTarget[] { },
+                                        new Dependency[] { },
+                                        true
+                                    ),
+                            }));
+
+            var targets = result.Should().HavePropertyAsObject("targets").Subject;
+            var target = targets.Should().HavePropertyAsObject("Target/runtime").Subject;
+            var library = target.Should().HavePropertyAsObject("PackageName/1.2.3").Subject;
+            var resources = library.Should().HavePropertyAsObject("resources").Subject;
+            var resource = resources.Should().HavePropertyAsObject("en-US/Fruits.resources.dll").Subject;
+            resource.Should().HavePropertyValue("locale", "en-US");
+        }
+
+
+        [Fact]
+        public void WritesResourceAssembliesForPortable()
+        {
+            var result = Save(Create(
+                            "Target",
+                            "runtime",
+                            true,
+                            runtimeLibraries: new[]
+                            {
+                                new RuntimeLibrary(
+                                        "package",
+                                        "PackageName",
+                                        "1.2.3",
+                                        "HASH",
+                                        new RuntimeAssembly[] { },
+                                        new []
+                                        {
+                                            new ResourceAssembly("en-US/Fruits.resources.dll", "en-US")
+                                        },
+                                        new RuntimeTarget[] { },
+                                        new Dependency[] { },
+                                        true
+                                    ),
+                            }));
+
+            var targets = result.Should().HavePropertyAsObject("targets").Subject;
+            var target = targets.Should().HavePropertyAsObject("Target").Subject;
+            var library = target.Should().HavePropertyAsObject("PackageName/1.2.3").Subject;
+            var resources = library.Should().HavePropertyAsObject("resources").Subject;
+            var resource = resources.Should().HavePropertyAsObject("en-US/Fruits.resources.dll").Subject;
+            resource.Should().HavePropertyValue("locale", "en-US");
+        }
+
+
+        [Fact]
         public void WritesCompilationOptions()
         {
             var result = Save(Create(compilationOptions: new CompilationOptions(

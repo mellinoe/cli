@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?define Servicing_Key_SP   =   "0" ?>
+  <?define Servicing_Key_SPIndex   =   "0" ?>
+  <?define Servicing_Key_SPName   =   "Beta" ?>
+  <?define Manufacturer     =   "Microsoft Corporation" ?>
+  <?define ProductName      =   "Microsoft .NET Core Shared Framework ($(var.SharedFramework_Name) $(var.SharedFramework_DisplayVersion))" ?>
+  <?define ProductLanguage  =   "1033" ?>
+  <?define ProductVersion   =   "$(var.SharedFramework_MSIVersion)" ?>
+  <?define LCID  = "$(var.ProductLanguage)"?>
+  <?define DowngradeErrorMessage  = "A newer version is already installed; please uninstall it and re-run setup."?>
+
+  <?define Platform   =   "$(sys.BUILDARCH)" ?>
+  <?if $(var.Platform)=x64?>
+  <?define Program_Files="ProgramFiles64Folder"?>
+  <?define Win64AttributeValue=yes?>
+  <?define UpgradeCode="$(var.SharedFramework_UpgradeCode)"?>
+  <?else?>
+  <?error Invalid Platform ($(var.Platform))?>
+  <?endif?>
+</Include>

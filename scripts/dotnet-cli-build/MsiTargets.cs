@@ -28,6 +28,8 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static string SharedHostMsi { get; set; }
 
+        private static string SharedFrameworkMsi { get; set; }
+
         private static string Engine { get; set; }
 
         private static string MsiVersion { get; set; }
@@ -67,6 +69,7 @@ namespace Microsoft.DotNet.Cli.Build
             Engine = Path.Combine(Path.GetDirectoryName(SdkBundle), ENGINE);
 
             SharedHostMsi = Path.ChangeExtension(c.BuildContext.Get<string>("SharedHostInstallerFile"), "msi");
+            SharedFrameworkMsi = Path.ChangeExtension(c.BuildContext.Get<string>("SharedFrameworkInstallerFile"), "msi");
 
             var buildVersion = c.BuildContext.Get<BuildVersion>("BuildVersion");
             MsiVersion = buildVersion.GenerateMsiVersion();
@@ -79,7 +82,7 @@ namespace Microsoft.DotNet.Cli.Build
 
         [Target(nameof(MsiTargets.InitMsi),
         nameof(GenerateDotnetSharedHostMsi),
-        nameof(GenerateDotnetSharedFxMsi),
+        nameof(GenerateDotnetSharedFrameworkMsi),
         nameof(GenerateCliSdkMsi))]
         [BuildPlatforms(BuildPlatform.Windows)]
         public static BuildTargetResult GenerateMsis(BuildTargetContext c)
@@ -120,10 +123,26 @@ namespace Microsoft.DotNet.Cli.Build
             return c.Success();
         }
 
-        [Target]
+        [Target(nameof(SharedFrameworkTargets.PublishSharedFramework))]
         [BuildPlatforms(BuildPlatform.Windows)]
-        public static BuildTargetResult GenerateDotnetSharedFxMsi(BuildTargetContext c)
+        public static BuildTargetResult GenerateDotnetSharedFrameworkMsi(BuildTargetContext c)
         {
+            string SharedFrameworkNuGetVersion = c.BuildContext.Get<string>("SharedFrameworkNugetVersion");
+
+            string WixObjRoot = Path.Combine(Dirs.Output, "obj", "wix", "sharedframework");
+
+            if (Directory.Exists(WixObjRoot))
+            {
+                Directory.Delete(WixObjRoot, true);
+            }
+
+            Directory.CreateDirectory(WixObjRoot);
+
+            Cmd("powershell", "-NoProfile", "-NoLogo",
+                Path.Combine(Dirs.RepoRoot, "packaging", "sharedframework", "windows", "generatemsi.ps1"),
+                c.BuildContext.Get<string>("SharedFrameworkPublishRoot"), SharedFrameworkMsi, WixRoot, MsiVersion, SharedFrameworkTargets.SharedFrameworkName, SharedFrameworkNuGetVersion, Utils.GenerateGuidFromName($"{SharedFrameworkNuGetVersion}-{Arch}").ToString().ToUpper(), Arch, WixObjRoot)
+                    .Execute()
+                    .EnsureSuccessful();
             return c.Success();
         }
 

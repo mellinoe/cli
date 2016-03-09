@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?include "Variables.wxi" ?>
+  <Fragment>
+    <ComponentGroup Id="AuthoredRegistryKeys">
+      <Component Id="SetupRegistry_x64" Directory="TARGETDIR" Win64="yes">
+        <RegistryKey Root="HKLM" Key="SOFTWARE\dotnet\sharedframework\$(var.SharedFramework_Name) $(var.SharedFramework_DisplayVersion)\Setup">
+          <RegistryValue Action="write" Name="Install" Type="integer" Value="1" KeyPath="yes"/>
+          <RegistryValue Action="write" Name="InstallDir" Type="string" Value="[SHAREDFRAMEWORKHOME]" />
+          <RegistryValue Action="write" Name="Version" Type="string" Value="$(var.SharedFramework_DisplayVersion)" />
+        </RegistryKey>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

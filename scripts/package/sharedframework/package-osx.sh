@@ -30,8 +30,14 @@ PACKAGE_LAYOUT_DIR="$OUTPUT_DIR/osx_sharedframework_intermediate"
 PACKAGE_OUTPUT_DIR="$OUTPUT_DIR/packages/sharedframework/osx"
 SHARED_FRAMEWORK_INSTALL_DIR="/usr/local/share/dotnet"
 
+COREHOST_LAYOUT_DIR="$OUTPUT_DIR/osx_sharedhost_intermediate"
+SHARED_HOST_INSTALL_DIR="/usr/local/share/dotnet/shared/NetCoreApp/1.0.0/x64"
+
 SHARED_FRAMEWORK_PKG_PACKAGE_NAME="dotnet-sharedframework-1.0.0"
 SHARED_FRAMEWORK_PKG_PACKAGE_ID="com.microsoft.dotnet.sharedframework.pkg.dotnet-osx-x64"
+
+SHARED_HOST_PKG_PACKAGE_NAME="dotnet-sharedhost-1.0.0"
+SHARED_HOST_PKG_PACKAGE_ID="com.microsoft.dotnet.sharedhost.pkg.dotnet-osx-x64"
 
 execute_build(){
     create_empty_pkg_layout
@@ -45,6 +51,9 @@ create_empty_pkg_layout(){
     rm -rf "$PACKAGE_LAYOUT_DIR"
     mkdir -p "$PACKAGE_LAYOUT_DIR"
     mkdir -p "$PACKAGE_LAYOUT_DIR/package_root"
+
+    rm -rf "$COREHOST_LAYOUT_DIR"
+    mkdir -p "$COREHOST_LAYOUT_DIR"
 }
 
 copy_files_to_pkg_layout(){
@@ -57,6 +66,7 @@ copy_files_to_pkg_layout(){
     # The process of using dotnet publish as a way to deploy the contents of NETStandard.Library causes a few extra
     # files to be present in the output that we don't want to package. Remove them. Note that we keep the .deps file
     # as the loader will use this to understand what assets are in the shared framework.
+    mv "$PACKAGE_LAYOUT_DIR/package_root/shared/NETCoreApp/1.0.0/x64/corehost" "$PACKAGE_LAYOUT_DIR/package_root/shared/NETCoreApp/1.0.0/x64/dotnet"
     rm "$PACKAGE_LAYOUT_DIR/package_root/shared/NETCoreApp/1.0.0/x64/1.0.0"
     rm "$PACKAGE_LAYOUT_DIR/package_root/shared/NETCoreApp/1.0.0/x64/1.0.0.dll"
     rm "$PACKAGE_LAYOUT_DIR/package_root/shared/NETCoreApp/1.0.0/x64/1.0.0.pdb"
@@ -69,7 +79,7 @@ copy_files_to_pkg_layout(){
 }
 
 create_pkg_package(){
-    header "Creating .pkg"
+    header "Creating Shared Framework .pkg"
     mkdir -p "$PACKAGE_OUTPUT_DIR"
 
     pkgbuild --root $PACKAGE_LAYOUT_DIR/package_root \
@@ -84,6 +94,7 @@ create_pkg_package(){
         > $PACKAGE_OUTPUT_DIR/Formatted-Distribution.xml
 
     PRODUCT_PKG_NAME=dotnet-sharedframework-x64.1.0.0.pkg
+    PRODUCT_ASSET_PATH=$REPOROOT/packaging/osx/resources
 
     header "Creating Product .pkg"
 
@@ -91,6 +102,7 @@ create_pkg_package(){
         --identifier com.microsoft.dotnet.sharedframework \
         --package-path $PACKAGE_OUTPUT_DIR \
         --distribution $PACKAGE_OUTPUT_DIR/Formatted-Distribution.xml \
+        --resources $PRODUCT_ASSET_PATH \
         $PACKAGE_OUTPUT_DIR/$PRODUCT_PKG_NAME
 }
 

@@ -21,7 +21,25 @@ namespace Microsoft.DotNet.Cli.Build
         [Target]
         public static BuildTargetResult PublishSharedFramework(BuildTargetContext c)
         {
-            string SharedFrameworkPublishRoot = Path.Combine(Dirs.Output, "obj", "sharedframework");
+            string publishLocation = Path.Combine(Dirs.Output, "obj", "sharedframework");
+            c.BuildContext["SharedFrameworkPublishRoot"] = publishLocation;
+            PublishSharedFramework(c, publishLocation);
+            return c.Success();
+        }
+
+        [Target]
+        [BuildPlatforms(BuildPlatform.OSX, BuildPlatform.Ubuntu)]
+        public static BuildTargetResult PublishSharedFrameworkDebug(BuildTargetContext c)
+        {
+            string sharedFrameworkPublishRoot = Path.Combine(Dirs.Output, "obj", "sharedframework-debug");
+            c.BuildContext["SharedFrameworkPublishRootDebug"] = sharedFrameworkPublishRoot;
+            PublishSharedFramework(c, sharedFrameworkPublishRoot);
+            StripNativeSymbols(sharedFrameworkPublishRoot);
+            return c.Success();
+        }
+
+        private static void PublishSharedFramework(BuildTargetContext c, string SharedFrameworkPublishRoot)
+        {
             string SharedFrameworkSourceRoot = Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "framework");
             string SharedFrameworkNugetVersion = GetVersionFromProjectJson(Path.Combine(Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "framework"), "project.json"));
 
@@ -35,7 +53,6 @@ namespace Microsoft.DotNet.Cli.Build
 
             DotNetCli.Stage0.Publish("--output", SharedFrameworkNameAndVersionRoot, SharedFrameworkSourceRoot).Execute().EnsureSuccessful();
 
-            c.BuildContext["SharedFrameworkPublishRoot"] = SharedFrameworkPublishRoot;
             c.BuildContext["SharedFrameworkNugetVersion"] = SharedFrameworkNugetVersion;
 
             // Clean up artifacts that dotnet-publish generates which we don't need
@@ -64,24 +81,39 @@ namespace Microsoft.DotNet.Cli.Build
             {
                 c.Warn("Shared framework will not be crossgen'd because mscorlib.ni.dll does not exist.");
             }
-
-            return c.Success();
         }
 
         [Target]
         public static BuildTargetResult PublishSharedHost(BuildTargetContext c)
         {
-            string SharedHostPublishRoot = Path.Combine(Dirs.Output, "obj", "sharedhost");
+            string sharedHostPublishRoot = Path.Combine(Dirs.Output, "obj", "sharedhost");
+            PublishSharedHost(sharedHostPublishRoot);
+            c.BuildContext["SharedHostPublishRoot"] = sharedHostPublishRoot;
+            return c.Success();
+        }
 
-            if (Directory.Exists(SharedHostPublishRoot))
+        [Target]
+        [BuildPlatforms(BuildPlatform.OSX, BuildPlatform.Ubuntu)]
+        public static BuildTargetResult PublishSharedHostDebug(BuildTargetContext c)
+        {
+            string sharedHostPublishRoot = Path.Combine(Dirs.Output, "obj", "sharedhost-debug");
+            PublishSharedHost(sharedHostPublishRoot);
+            c.BuildContext["SharedHostPublishRootDebug"] = sharedHostPublishRoot;
+            StripNativeSymbols(sharedHostPublishRoot);
+            return c.Success();
+        }
+
+        private static void PublishSharedHost(string sharedHostPublishRoot)
+        {
+            if (Directory.Exists(sharedHostPublishRoot))
             {
-                Directory.Delete(SharedHostPublishRoot, true);
+                Directory.Delete(sharedHostPublishRoot, true);
             }
 
-            DotNetCli.Stage0.Publish("--output", SharedHostPublishRoot, Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "host")).Execute().EnsureSuccessful();
+            DotNetCli.Stage0.Publish("--output", sharedHostPublishRoot, Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "host")).Execute().EnsureSuccessful();
 
             // For the shared host, we only want corerun and not any of the other artifacts in the package (like the hostpolicy)
-            foreach (var filePath in Directory.GetFiles(SharedHostPublishRoot))
+            foreach (var filePath in Directory.GetFiles(sharedHostPublishRoot))
             {
                 if (Path.GetFileName(filePath) != $"{CoreHostBaseName}{Constants.ExeSuffix}")
                 {
@@ -90,18 +122,23 @@ namespace Microsoft.DotNet.Cli.Build
             }
 
             // corehost will be renamed to dotnet at some point and then this can be removed.
-            File.Move(Path.Combine(SharedHostPublishRoot, $"{CoreHostBaseName}{Constants.ExeSuffix}"), Path.Combine(SharedHostPublishRoot, $"dotnet{Constants.ExeSuffix}"));
+            File.Move(Path.Combine(sharedHostPublishRoot, $"{CoreHostBaseName}{Constants.ExeSuffix}"), Path.Combine(sharedHostPublishRoot, $"dotnet{Constants.ExeSuffix}"));
+        }
 
-            c.BuildContext["SharedHostPublishRoot"] = SharedHostPublishRoot;
-
-            return c.Success();
+        private static void StripNativeSymbols(string sharedFrameworkPublishRoot)
+        {
+            const string stripCommand = "strip";
+            foreach (string nativeFile in Directory.EnumerateFiles(sharedFrameworkPublishRoot, $"*.{Constants.DynamicLibSuffix}*", SearchOption.AllDirectories))
+            {
+                Cmd(stripCommand, nativeFile).Execute().EnsureSuccessful();
+            }
         }
 
         private static string GetVersionFromProjectJson(string pathToProjectJson)
         {
             Regex r = new Regex($"\"{Regex.Escape(SharedFrameworkName)}\"\\s*:\\s*\"(?'version'[^\"]*)\"");
 
-            foreach(var line in File.ReadAllLines(pathToProjectJson))
+            foreach (var line in File.ReadAllLines(pathToProjectJson))
             {
                 var m = r.Match(line);
 
@@ -133,7 +170,7 @@ namespace Microsoft.DotNet.Cli.Build
                 // we need to be able to look at the project.lock.json file and figure out what version of Microsoft.NETCore.Runtime.CoreCLR
                 // was used, and then select that version.
                 ExecSilent(Crossgen.GetCrossgenPathForVersion(CompileTargets.CoreCLRVersion),
-                    "-readytorun", "-in", file, "-out", tempPathName, "-platform_assemblies_paths", pathToAssemblies);                  
+                    "-readytorun", "-in", file, "-out", tempPathName, "-platform_assemblies_paths", pathToAssemblies);
 
                 File.Delete(file);
                 File.Move(tempPathName, file);
@@ -151,7 +188,8 @@ namespace Microsoft.DotNet.Cli.Build
                         return peReader.HasMetadata;
                     }
                 }
-            } catch (BadImageFormatException) { }
+            }
+            catch (BadImageFormatException) { }
 
             return false;
         }

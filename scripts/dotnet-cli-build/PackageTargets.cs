@@ -24,6 +24,8 @@ namespace Microsoft.DotNet.Cli.Build
         nameof(PackageTargets.GenerateVersionBadge),
         nameof(SharedFrameworkTargets.PublishSharedHost),
         nameof(SharedFrameworkTargets.PublishSharedFramework),
+        nameof(SharedFrameworkTargets.PublishSharedHostDebug),
+        nameof(SharedFrameworkTargets.PublishSharedFrameworkDebug),
         nameof(PackageTargets.GenerateCompressedFile),
         nameof(InstallerTargets.GenerateInstaller),
         nameof(PackageTargets.GenerateNugetPackages))]

@@ -24,7 +24,6 @@ namespace Microsoft.DotNet.Cli.Build
 
         private static readonly HashSet<string> crossgenSkippedAssemblies = new HashSet<string>()
         {
-            "Microsoft.CodeAnalysis.dll"
         };
 
         [Target(nameof(PackageSharedFramework), nameof(CrossGenAllManagedAssemblies))]

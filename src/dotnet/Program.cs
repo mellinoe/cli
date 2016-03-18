@@ -15,6 +15,7 @@ using Microsoft.DotNet.Tools.Compiler;
 using Microsoft.DotNet.Tools.Compiler.Csc;
 using Microsoft.DotNet.Tools.Compiler.Fsc;
 using Microsoft.DotNet.Tools.Compiler.Native;
+using Microsoft.DotNet.Tools.Compiler.Mcg;
 using Microsoft.DotNet.Tools.Help;
 using Microsoft.DotNet.Tools.New;
 using Microsoft.DotNet.Tools.Publish;
@@ -106,6 +107,7 @@ namespace Microsoft.DotNet.Cli
                 ["compile-fsc"] = CompileFscCommand.Run,
                 ["compile-native"] = CompileNativeCommand.Run,
                 ["help"] = HelpCommand.Run,
+                ["mcg"] = McgCommand.Run,
                 ["new"] = NewCommand.Run,
                 ["pack"] = PackCommand.Run,
                 ["projectmodel-server"] = ProjectModelServerCommand.Run,

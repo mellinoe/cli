@@ -39,6 +39,7 @@
 
     "symlinks": {
         "bin/dotnet" : "usr/bin/dotnet",
+        "bin/dotnet-mcg": "usr/bin/dotnet-mcg",
         "bin/dotnet-compile-native" : "/usr/bin/dotnet-compile-native"
     }
 }

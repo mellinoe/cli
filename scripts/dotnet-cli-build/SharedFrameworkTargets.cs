@@ -176,6 +176,7 @@ namespace Microsoft.DotNet.Cli.Build
         public static BuildTargetResult CrossGenAllManagedAssemblies(BuildTargetContext c)
         {
             string pathToAssemblies = c.BuildContext.Get<string>("SharedFrameworkNameAndVersionRoot");
+            string SharedFrameworkSourceRoot = Path.Combine(Dirs.RepoRoot, "src", "sharedframework", "framework");
 
             foreach (var file in Directory.GetFiles(pathToAssemblies))
             {
@@ -188,12 +189,14 @@ namespace Microsoft.DotNet.Cli.Build
 
                 string tempPathName = Path.ChangeExtension(file, "readytorun");
 
-                // This is not always correct. The version of crossgen we need to pick up is whatever one was restored as part
-                // of the Microsoft.NETCore.Runtime.CoreCLR package that is part of the shared library. For now, the version hardcoded
-                // in CompileTargets and the one in the shared library project.json match and are updated in lock step, but long term
-                // we need to be able to look at the project.lock.json file and figure out what version of Microsoft.NETCore.Runtime.CoreCLR
-                // was used, and then select that version.
-                ExecSilent(Crossgen.GetCrossgenPathForVersion(CompileTargets.CoreCLRVersion),
+                string lockFile = Path.Combine(SharedFrameworkSourceRoot, "project.lock.json");
+                if (!File.Exists(lockFile))
+                {
+                    return c.Failed("Shared framework project.lock.json does not exist. Restore was not run successfully.");
+                }
+
+                string coreClrVersion = ParseCoreClrVersionFromLockFile(lockFile);
+                ExecSilent(Crossgen.GetCrossgenPathForVersion(coreClrVersion),
                     "-readytorun", "-in", file, "-out", tempPathName, "-platform_assemblies_paths", pathToAssemblies);                  
 
                 File.Delete(file);
@@ -217,6 +220,18 @@ namespace Microsoft.DotNet.Cli.Build
             } catch (BadImageFormatException) { }
 
             return false;
+        }
+
+        private static string ParseCoreClrVersionFromLockFile(string lockFilePath)
+        {
+            string contents = File.ReadAllText(lockFilePath);
+            var match  = Regex.Match(contents, "Microsoft.NETCore.Runtime.CoreCLR/([^\"]*)\"");
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+
+            throw new InvalidOperationException($"Couldn't parse the CoreCLR version from lock file: {lockFilePath}");
         }
     }
 }

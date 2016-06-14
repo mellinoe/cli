@@ -126,11 +126,11 @@ function Get-Latest-Version-Info([string]$AzureFeed, [string]$AzureChannel, [str
         $VersionFileUrl = "$AzureFeed/$AzureChannel/dnvm/latest.win.$CLIArchitecture.version"
     }
     
-    $Response = Invoke-WebRequest -UseBasicParsing $VersionFileUrl
+    $Response = Core-WebRequest $VersionFileUrl $null
 
-    switch ($Response.Headers.'Content-Type'){
-        { ($_ -eq "application/octet-stream") } { $VersionText = [Text.Encoding]::UTF8.GetString($Response.Content) }
-        { ($_ -eq "text/plain") } { $VersionText = $Response.Content }
+    switch ($Response.Content.Headers.ContentType.ToString()){
+        { ($_ -eq "application/octet-stream") } { $VersionText = [Text.Encoding]::UTF8.GetString($Response.Content.ReadAsStringAsync().Result) }
+        { ($_ -eq "text/plain") } { $VersionText = $Response.Content.ReadAsStringAsync().Result }
         default { throw "``$Response.Headers.'Content-Type'`` is an unknown .version file content type." }
     }
     
@@ -138,6 +138,24 @@ function Get-Latest-Version-Info([string]$AzureFeed, [string]$AzureChannel, [str
     $VersionInfo = Get-Version-Info-From-Version-Text $VersionText
 
     return $VersionInfo
+}
+
+# Barebones web request using HttpClient
+# Returns a regular HttpResponseMessage.
+function Core-WebRequest([string]$Url, [string]$DownloadPath) {
+    Say-Invocation $MyInvocation
+
+    Add-Type -AssemblyName System.Net.Http
+    $client = New-Object -TypeName System.Net.Http.Httpclient
+    $task = $client.GetAsync($Url)
+    $result = $task.Result
+    if (![string]::IsNullOrEmpty($DownloadPath)) {
+        $fs = [IO.File]::Create($DownloadPath)
+        $result.Content.CopyToAsync($fs).Wait()
+        $fs.Dispose()
+    }
+
+    return $result
 }
 
 # TODO: AzureChannel and Channel should be unified
@@ -342,7 +360,7 @@ New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
 foreach ($DownloadLink in $DownloadLinks) {
     $ZipPath = [System.IO.Path]::GetTempFileName()
     Say "Downloading $DownloadLink"
-    $resp = Invoke-WebRequest -UseBasicParsing $DownloadLink -OutFile $ZipPath
+    $resp = Core-WebRequest $DownloadLink $ZipPath
 
     Say "Extracting zip from $DownloadLink"
     Extract-Dotnet-Package -ZipPath $ZipPath -OutPath $InstallRoot

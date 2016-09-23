@@ -2,7 +2,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.1"
+      "version": "1.1.0-preview1-000980-00"
     },
     "dotnet": {
       "target": "project"
@@ -22,7 +22,7 @@
     "System.Net.NameResolution": "4.0.0"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": [
         "netstandardapp1.5",
         "dotnet5.4",

@@ -3,7 +3,7 @@
   "dependencies": {
     "Microsoft.NETCore.App": {
       "type": "platform",
-      "version": "1.0.1"
+      "version": "1.1.0-preview1-000980-00"
     },
     "Newtonsoft.Json": "9.0.1",
     "dotnet": {
@@ -19,7 +19,7 @@
     "FluentAssertions": "4.2.2"
   },
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
       "imports": [
         "netstandardapp1.5",
         "dotnet5.4",

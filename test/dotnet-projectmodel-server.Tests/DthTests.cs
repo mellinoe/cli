@@ -53,7 +53,7 @@ namespace Microsoft.DotNet.ProjectModel.Server.Tests
                                                             .AssertJArrayCount(2)
                                                             .Select(f => f["ShortName"].Value<string>());
 
-                Assert.Contains("netcoreapp1.0", frameworkShortNames);
+                Assert.Contains("netcoreapp1.1", frameworkShortNames);
                 Assert.Contains("dnx451", frameworkShortNames);
             }
         }

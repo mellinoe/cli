@@ -27,7 +27,8 @@
   "tools": {
     "dotnet-portable": {
       "version": "1.0.0",
-      "target": "package"
+      "target": "package",
+      "imports": "netcoreapp1.1"
     }
   }
 }

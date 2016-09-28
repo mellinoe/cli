@@ -15,8 +15,7 @@
   "tools": {
     "ToolWithOutputName": {
       "version": "1.0.0",
-      "target": "package",
-      "imports": "netcoreapp1.1"
+      "target": "package"
     }
   }
 }

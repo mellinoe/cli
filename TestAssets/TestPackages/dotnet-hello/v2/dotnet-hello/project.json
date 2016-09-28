@@ -7,7 +7,7 @@
     "Microsoft.NETCore.App": "1.1.0-preview1-000980-00"
   },
   "frameworks": {
-    "netcoreapp1.1": {}
+    "netcoreapp1.0": {}
   },
   "runtimes": {
     "win7-x64": {},
